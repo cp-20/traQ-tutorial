@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { state, actions } = useTraqAuthStore()
-const achievements = [
+
+const achievements = ref([
   {
     id: 'times',
     label: 'timesを作る',
@@ -21,7 +22,28 @@ const achievements = [
     label: '10投稿する',
     status: await actions.isEnoughPosts(10)
   },
-] as const
+])
+
+const createTimesLoading = ref(false)
+const createTimes = async () => {
+  createTimesLoading.value = true
+  const result = await actions.createTimes()
+  createTimesLoading.value = false
+  if (result) {
+    achievements.value[0].status = true
+  }
+}
+
+const setHomeChannelLoading = ref(false)
+const setHomeChannel = async () => {
+  setHomeChannelLoading.value = true
+  const result = await actions.setHomeChannel()
+  setHomeChannelLoading.value = false
+  if (result) {
+    achievements.value[0].status = true
+  }
+}
+
 </script>
 
 <template>
@@ -53,14 +75,22 @@ const achievements = [
           <template v-if="achievement.id === 'times'">
             <button
               class="border-2 border-zinc-200 hover:bg-zinc-50 transition-colors duration-150 py-1 rounded-md mb-8"
-              v-if="!achievement.status" @click="actions.createTimes()">timesを作る (#gps/times/{{
-                state.me.name }})</button>
+              v-if="!achievement.status" @click="createTimes()">
+              <span>
+                timesを作る (#gps/times/{{ state.me.name }})
+              </span>
+              <loading-icon v-if="createTimesLoading" class="w-6 h-6" /></button>
           </template>
           <template v-if="achievement.id === 'homeChannel'">
             <button
-              class="border-2 border-zinc-200 hover:bg-zinc-50 transition-colors duration-150 py-1 rounded-md mb-8"
-              v-if="!achievement.status" :disabled="!achievements[0].status"
-              @click="actions.setHomeChannel()">ホームチャンネルを設定する</button>
+              class="border-2 border-zinc-200 hover:bg-zinc-50 transition-colors duration-150 py-1 rounded-md mb-8 flex items-center justify-center gap-2"
+              v-if="!achievement.status" :disabled="!achievements[0].status || setHomeChannelLoading"
+              @click="setHomeChannel()">
+              <span>
+                ホームチャンネルを設定する
+              </span>
+              <loading-icon v-if="setHomeChannelLoading" class="w-6 h-6" />
+            </button>
           </template>
           <template v-if="achievement.id === 'introduction'">
             <a v-if="!achievement.status"
