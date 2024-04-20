@@ -1,7 +1,8 @@
 import { sha256 } from 'js-sha256';
 import { useTraqAuthStore } from '~/stores/traq-auth';
+import { traqDomain } from '~/utils/traq';
 
-const baseUrl = 'https://q.trap.jp/api/v3/oauth2';
+const baseUrl = `${traqDomain}/api/v3/oauth2`;
 
 const getClientId = () => {
   const config = useRuntimeConfig();

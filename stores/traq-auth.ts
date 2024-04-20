@@ -6,7 +6,7 @@ import {
   type MyUserDetail,
 } from 'traq-bot-ts';
 
-const api = new Api();
+const api = new Api({ baseUrl: `${traqDomain}/api/v3` });
 
 type AuthStore = {
   me: MyUserDetail | null;
@@ -58,6 +58,7 @@ export const useTraqAuthStore = defineStore(
       },
       getMyTimes: async (): Promise<Channel | null> => {
         if (state.value.accessToken === null) return null;
+
         const res = await api.channels.getChannels(
           { 'include-dm': false },
           props.value
@@ -73,8 +74,8 @@ export const useTraqAuthStore = defineStore(
             .map((child) => channels.find((c) => c.id === child)!)
             .find(
               (c) =>
-                c.name === state.value.me?.name &&
-                state.value.me.homeChannel === c.id
+                c.name === state.value.me?.name ||
+                state.value.me?.homeChannel === c.id
             ) ?? null
         );
       },
@@ -82,7 +83,12 @@ export const useTraqAuthStore = defineStore(
         return (await actions.getMyTimes()) !== null;
       },
       isIntroductionSet: async (): Promise<boolean> => {
+        // ステージング環境では検索が使えないのでとりあえずfalseを返す
+        if (process.env.NODE_ENV === 'development') return false;
+
         if (state.value.accessToken === null) return false;
+        if (state.value.me === null) return false;
+
         const res = await api.channels.getChannels(
           { 'include-dm': false },
           props.value
@@ -96,13 +102,16 @@ export const useTraqAuthStore = defineStore(
         );
 
         const introductionMessage = await api.messages.searchMessages(
-          { from: state.value.me?.id, in: introductionChannel.id },
+          { from: state.value.me.id, in: introductionChannel.id },
           props.value
         );
 
         return introductionMessage.data.hits.length > 0;
       },
       isEnoughPosts: async (border: number): Promise<boolean> => {
+        // ステージング環境では検索が使えないのでとりあえずfalseを返す
+        if (process.env.NODE_ENV === 'development') return false;
+
         if (state.value.accessToken === null) return false;
         const res = await api.messages.searchMessages(
           {
