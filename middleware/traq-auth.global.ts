@@ -97,6 +97,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const data = await res.json();
     state.accessToken = data.access_token;
     clearSessionStorage();
+    return navigateTo('/');
   }
 
   if (!state.me) await actions.getMe();
