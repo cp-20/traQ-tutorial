@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <NuxtPage />
-  </div>
+  <NuxtPage :page-key="route => route.fullPath" />
 </template>
 
 <style>

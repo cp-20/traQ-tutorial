@@ -146,6 +146,12 @@ export const useTraqAuthStore = defineStore(
         );
         if (!res2.ok) return false;
 
+        await api.channels.editChannelSubscribers(
+          res2.data.id,
+          { on: [state.value.me.id] },
+          props.value
+        );
+
         return true;
       },
       setHomeChannel: async (): Promise<boolean> => {
