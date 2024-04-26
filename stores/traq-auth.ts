@@ -108,6 +108,24 @@ export const useTraqAuthStore = defineStore(
 
         return introductionMessage.data.hits.length > 0;
       },
+      isAvatarChanged: async (): Promise<boolean> => {
+        if (state.value.accessToken === null) return false;
+        if (state.value.me === null) return false;
+
+        const res = await api.users.getUser(state.value.me.id, props.value);
+        if (!res.ok) return false;
+
+        const res2 = await api.files.getFileMeta(res.data.iconFileId);
+        if (!res2.ok) return false;
+
+        const res3 = await fetch(
+          `https://qidenticon.trap.show/${state.value.me.name}/md5`
+        );
+        if (!res3.ok) return false;
+        const defaultMD5 = await res3.text();
+
+        return res2.data.md5 !== defaultMD5;
+      },
       isEnoughPosts: async (border: number): Promise<boolean> => {
         // ステージング環境では検索が使えないのでとりあえずfalseを返す
         if (process.env.NODE_ENV === 'development') return false;

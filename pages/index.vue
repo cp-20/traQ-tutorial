@@ -20,6 +20,11 @@ const achievements = ref([
     status: await actions.isIntroductionSet()
   },
   {
+    id: 'avatar',
+    label: 'アイコンを設定する',
+    status: await actions.isAvatarChanged()
+  },
+  {
     id: '10posts',
     label: '10投稿する',
     status: await actions.isEnoughPosts(10)
@@ -98,11 +103,19 @@ const setHomeChannel = async () => {
               <loading-icon v-if="setHomeChannelLoading" />
             </button>
           </template>
+          <template v-if="achievement.id === 'avatar'">
+            <a v-if="!achievement.status"
+              class="border-2 border-zinc-200 hover:bg-zinc-50 transition-colors duration-150 py-1 rounded-md block text-center mb-8"
+              :href="`${traqDomain}/settings/profile`">
+              プロフィール設定を開く
+            </a>
+          </template>
           <template v-if="achievement.id === 'introduction'">
             <a v-if="!achievement.status"
               class="border-2 border-zinc-200 hover:bg-zinc-50 transition-colors duration-150 py-1 rounded-md block text-center mb-8"
-              :href="`${traqDomain}/channels/random/jikoshokai`">#random/jikoshokai
-              を開く</a>
+              :href="`${traqDomain}/channels/random/jikoshokai`">
+              #random/jikoshokai を開く
+            </a>
           </template>
         </template>
       </div>
