@@ -115,7 +115,10 @@ export const useTraqAuthStore = defineStore(
         const res = await api.users.getUser(state.value.me.id, props.value);
         if (!res.ok) return false;
 
-        const res2 = await api.files.getFileMeta(res.data.iconFileId);
+        const res2 = await api.files.getFileMeta(
+          res.data.iconFileId,
+          props.value
+        );
         if (!res2.ok) return false;
 
         const res3 = await fetch(
